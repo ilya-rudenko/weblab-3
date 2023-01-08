@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+>
+<h:head>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script src="resources/js/main.js"></script>
+    <link rel="stylesheet" type="text/css" href="resources/css/main.css"/>
+</h:head>
+<h:body>
+    <f:view>
+        <div class="columns">
+            <div class="inputs">
+                <div>
+                    <h:panelGrid id="panelCanvas">
+                        <canvas id="canvas" width="300" height="300" class="canvas">
+                            График
+                        </canvas>
+                    </h:panelGrid>
+                </div>
+                <h:form id="controls-form">
+                    <div class="input-block">
+                        <h:outputText value="X value: "/>
+                        <h:inputText id="x-value" styleClass="x-value" value="#{entriesBean.entry.xValue}" a:placeholder="Число от -5 до 5..."/>
+                        <p:slider for="x-value" display="x-value" styleClass="slider" step="1" minValue="-5" maxValue="5"/>
+                    </div>
+                    <div class="input-block">
+                        <h:outputLabel for="y-value" value="Y value: "/>
+                        <h:inputText id="y-value" styleClass="input_form__y"
+                                     maxlength="5" autocomplete="off" a:placeholder="Число от -3 до 3..."
+                                     value="#{entriesBean.entry.yValue}">
+                            <f:validateRequired/>
+                            <f:validateDoubleRange minimum="-3" maximum="3"/>
+                        </h:inputText>
+                    </div>
+                    <div class="input-block">
+                        <div class="rButton">
+                            <h:outputLabel value="R value: "/>
+                            <h:selectOneMenu id="r-value" styleClass="r-value" value = "#{entriesBean.entry.rValue}">
+                                <f:selectItem itemValue = "1" itemLabel = "1" />
+                                <f:selectItem itemValue = "2" itemLabel = "2" />
+                                <f:selectItem itemValue = "3" itemLabel = "3" />
+                                <f:selectItem itemValue = "4" itemLabel = "4" />
+                                <f:selectItem itemValue = "5" itemLabel = "5" />
+                            </h:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="control-buttons">
+                        <h:commandButton id="submitButton" styleClass="input-form__submit" value="Отправить" action="#{entriesBean.addEntry}" >
+                            <f:ajax execute="@form" render="results" onevent='
+                                (data) => {
+                                if (data.status === "success") {
+                                    handleSubmit();
+                                }}
+                            '/>
+                        </h:commandButton>
+                        <h:commandButton id="reset" value="Очистить" action="#{entriesBean.clearEntries}" immediate="true"/>
+                    </div>
+                </h:form>
+                <div>
+                    <h:link outcome="goToIndex" style="margin-top: 50px">
+                        На приветственную страницу
+                    </h:link>
+                </div>
+            </div>
+            <div class="table">
+                <h:dataTable id="results" styleClass="result-table" value="#{entriesBean.entries}" var="entry">
+                            <h:column>
+                                <f:facet name="header">X</f:facet>
+                                <h:outputText value="#{entry.xValue}"/>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Y</f:facet>
+                                <h:outputText value="#{entry.yValue}"/>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">R</f:facet>
+                                <h:outputText value="#{entry.rValue}"/>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Результат</f:facet>
+                                <h:outputText value="#{entry.hitResult}"/>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Дата и время</f:facet>
+                                <h:outputText value="#{entry.dateTime}"/>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Время выполнения скрипта</f:facet>
+                                <h:outputText value="#{entry.scriptTime} нс"/>
+                            </h:column>
+                        </h:dataTable>
+                <div>
+                    <p:commandButton id="back" value="Назад" action="#{entriesBean.minusPage}" update="results, pageNumber" onclick="
+                        setTimeout(handleSubmit,300);
+                    "/>
+                    <h:outputText id="pageNumber" value="#{entriesBean.page}" />
+                    <p:commandButton id="forward" value="Вперед" action="#{entriesBean.plusPage}" update="results, pageNumber" onclick="
+                        setTimeout(handleSubmit,300);
+                    "/>
+                </div>
+            </div>
+        </div>
+    </f:view>
+</h:body>
+
+</html>
